@@ -143,7 +143,3 @@ mybatis-plus:
 
 
 
-minio:
-  endpoint: https://files.cogiot.net/
-  accesskey: Admin_2021@Cog
-  secretKey: Admin_2021@Cog

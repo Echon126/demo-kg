@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SpringBoot多文件上传</title>
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+</head>
+<body>
+
+<form th:action="@{/file/x}" method="post" enctype="multipart/form-data">
+    姓名：<input type="text" name="alarmId"/><br/>
+    <!--		选择多个文件上传  这里是一个个的呀-->
+    照片1：<input type="file" name="photo"/><br/>
+    照片2：<input type="file" name="photo"/><br/>
+    照片3：<input type="file" name="photo"/><br/>
+    <input type="submit" value="上传"/>
+</form>
+<div>
+    <h1>我的图</h1>
+    <img src="https://filesdev.cogiot.net/tieta/%E5%B0%8F%E8%80%B3%E6%9C%B5%20%281%29%20%285%29.jpeg?Content-Disposition=attachment%3B%20filename%3D%22%E5%B0%8F%E8%80%B3%E6%9C%B5%20%281%29%20%285%29.jpeg%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=cogiot%2F20210915%2F%2Fs3%2Faws4_request&X-Amz-Date=20210915T060224Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=60af6a8f160f5aaa57faafea2ac6f77ac235c604556aae29c2a4ff16e847211f" />
+</div>
+</body>
+</html>

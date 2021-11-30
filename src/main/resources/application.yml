@@ -1,0 +1,149 @@
+server:
+  port: 8089
+
+applicationConfig:
+  username: admin
+  password: CogiotP@88w0rd
+  type: login
+  jfrogUrl: http://58.241.133.29:8082/
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/  #prefix：指定模板所在的目录
+    check-template-location: true  #check-tempate-location: 检查模板路径是否存在
+    cache: false  #cache: 是否缓存，开发模式下设置为false，避免改了模板还要重启服务器，线上设置为true，可以提高性能。
+    suffix: .html
+    #encoding: UTF-8
+    #content-type: text/html
+    mode: HTML5
+  mail:
+    host: 'smtp.mxhichina.com'
+    username: 'zhangwenjie@cogiot.com'
+    password: '123456'
+    port: 25
+  datasource:
+    url: jdbc:mysql://localhost:3306/importdata?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 连接池中允许的最大连接数。缺省值：10
+      maximum-pool-size: 100
+      # 连接池中允许的最小连接数。缺省值：10
+      minimum-idle: 10
+      # 自动提交
+      auto-commit: true
+      # 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟
+      idle-timeout: 30000
+      # 连接池名字
+      pool-name: FlyduckHikariCP
+      # 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒
+      max-lifetime: 1800000
+      # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒
+      connection-timeout: 30000
+      # 数据库连接测试语句
+      connection-test-query: SELECT 1
+
+  kafka:
+    bootstrap-servers: 127.0.0.1:9093
+    producer:
+      # 发生错误后，消息重发的次数。
+      retries: 0
+      #当有多个消息需要被发送到同一个分区时，生产者会把它们放在同一个批次里。该参数指定了一个批次可以使用的内存大小，按照字节数计算。
+      batch-size: 16384
+      # 设置生产者内存缓冲区的大小。
+      buffer-memory: 33554432
+      # 键的序列化方式
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 值的序列化方式
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # acks=0 ： 生产者在成功写入消息之前不会等待任何来自服务器的响应。
+      # acks=1 ： 只要集群的首领节点收到消息，生产者就会收到一个来自服务器成功响应。
+      # acks=all ：只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。
+      acks: 0
+#      properties:
+#          security:
+#            protocol: SASL_PLAINTEXT
+#          sasl:
+#            jaas:
+#              config: org.apache.kafka.common.security.plain.PlainLoginModule required username="leo" password="leopwd";
+    consumer:
+      # 自动提交的时间间隔 在spring boot 2.X 版本中这里采用的是值的类型为Duration 需要符合特定的格式，如1S,1M,2H,5D
+      auto-commit-interval: 1S
+      # 该属性指定了消费者在读取一个没有偏移量的分区或者偏移量无效的情况下该作何处理：
+      # latest（默认值）在偏移量无效的情况下，消费者将从最新的记录开始读取数据（在消费者启动之后生成的记录）
+      # earliest ：在偏移量无效的情况下，消费者将从起始位置读取分区的记录
+      auto-offset-reset: earliest
+      # 是否自动提交偏移量，默认值是true,为了避免出现重复数据和数据丢失，可以把它设置为false,然后手动提交偏移量
+      enable-auto-commit: false
+      # 键的反序列化方式
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 值的反序列化方式
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    #      properties:
+#        security:
+#          protocol: SASL_PLAINTEXT
+#        sasl:
+#          jaas:
+#            config: org.apache.kafka.common.security.plain.PlainLoginModule required username="leo" password="leopwd";
+    listener:
+      # 在侦听器容器中运行的线程数。
+      concurrency: 5
+      #listner负责ack，每调用一次，就立即commit
+      ack-mode: manual_immediate
+      missing-topics-fatal: false
+
+
+    #  mqtt:
+    #    client:
+    #      # 1.fix
+    #      url: tcp://device1-api.cogiot.net:1883
+    #      clientId: ywq89wqeiukdklas9548
+    #      #      clientId: ywq89wqeiukdklas9
+    #      keepAliveInterval: 30
+    #      connectionTimeout: 30
+    #    consumer:
+    #      defaultQos: 1
+    #      completionTimeout: 30000
+    #      telitTriggerMQTTTopics: thing/+/attribute/m2
+
+    #  rabbitmq:
+    #    host: 127.0.0.1
+    #    port: 5672
+    #    username: guest
+    #    password: guest
+    #    virtual-host: /JCcccHost  rabbitmq:
+    #    host: 127.0.0.1
+    #    port: 5672
+    #    username: guest
+    #    password: guest
+    #    virtual-host: /JCcccHost
+    # 手动提交消息
+  #    listener:
+  #      simple:
+  #        acknowledge-mode: manual
+  #      direct:
+  #        acknowledge-mode: manual
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 1000MB
+  freemarker:
+    suffix:
+
+
+#https://blog.csdn.net/wojiao228925661/article/details/81329660
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.example.demo.domain.entity
+
+
+
+minio:
+  endpoint: https://files.cogiot.net/
+  accesskey: Admin_2021@Cog
+  secretKey: Admin_2021@Cog

@@ -35,12 +35,13 @@ public class KafkaController {
 
     @GetMapping("/batch/send")
     public String batchSendKafka() {
-        User user = new User();
-        user.setUserName("HS");
-        user.setDescription("text");
-        user.setCreateTime(LocalDateTime.now());
+        User user = User.builder()
+                .userName("HS")
+                .description("text")
+                .createTime(LocalDateTime.now())
+                .build();
 
-        for (int i = 0; i < 700; i++) {
+        for (int i = 0; i < 5; i++) {
             user.setId(UUID.randomUUID().toString());
             //日期格式化
             String JSONUser = JSON.toJSONStringWithDateFormat(user, Contants.DateTimeFormat.DATE_TIME_PATTERN,

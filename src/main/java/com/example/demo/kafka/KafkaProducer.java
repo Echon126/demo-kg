@@ -31,7 +31,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class KafkaProducer {
 
     @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     //自定义topic
     public static final String TOPIC_TEST = "topic.test";
@@ -47,9 +47,9 @@ public class KafkaProducer {
         log.info("准备发送消息为：{}", obj2String);
 
         //发送消息
-        ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send(TOPIC_TEST, obj);
+        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(TOPIC_TEST, obj2String);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
+        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
             @Override
             public void onFailure(Throwable throwable) {
                 //发送失败的处理
@@ -57,7 +57,7 @@ public class KafkaProducer {
             }
 
             @Override
-            public void onSuccess(SendResult<String, Object> stringObjectSendResult) {
+            public void onSuccess(SendResult<String, String> stringObjectSendResult) {
                 //成功的处理
                 log.info(TOPIC_TEST + " - 生产者 发送消息成功：" + stringObjectSendResult.toString());
             }

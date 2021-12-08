@@ -64,6 +64,12 @@ spring:
       acks: 0
       linger: 1
 #      properties:
+#        linger.ms: 50
+#        request.timeout.ms: 500
+#        max.block.ms: 500
+#        metadata.fetch.timeout.ms: 500
+#        max.in.flight.requests.per.connection: 20
+    #      properties:
 #          security:
 #            protocol: SASL_PLAINTEXT
 #          sasl:

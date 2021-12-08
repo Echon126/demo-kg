@@ -7,6 +7,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 
 @Component
@@ -19,7 +20,7 @@ public class KafkaSender {
     public KafkaSender(KafkaTemplate<String, String> kafkaTemplate) {
         this.KAFKA_TEMPLATE = kafkaTemplate;
     }
-	
+
     public void sendMessage(String topic, String message){
 
         ListenableFuture<SendResult<String, String>> sender = KAFKA_TEMPLATE.send(new ProducerRecord<>(topic, message));
@@ -28,7 +29,21 @@ public class KafkaSender {
 //        //发送失败回调
 //        FailureCallback failureCallback = ex -> log.error("数据发送失败!");
 
-        sender.addCallback(result -> {}, ex -> log.error("数据发送失败!"));
+       // sender.addCallback(result -> {}, ex -> log.error("数据发送失败!"));
+
+        sender.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+               // log.error("failure");
+            }
+
+            @Override
+            public void onSuccess(SendResult<String, String> stringStringSendResult) {
+               // log.info("success");
+            }
+        });
+
+       // log.info("xxxxxx");
     }
 
 }

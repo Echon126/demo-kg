@@ -17,9 +17,12 @@ import java.util.List;
 @Component
 public class KafkaListeners {
 
+    private static int count = 0;
+    private static int timeCount = 0;
+
     @KafkaListener(containerFactory = "kafkaBatchListener6", topics = {"#{'${spring.kafka.listener.topics}'.split(',')[0]}"}, groupId = KafkaProducer.TOPIC_GROUP1)
     public void batchListener(List<ConsumerRecord<?, ?>> records, Acknowledgment ack) {
-
+        long startTime = System.currentTimeMillis();
         List<User> userList = new ArrayList<>();
         try {
             records.forEach(record -> {
@@ -35,8 +38,9 @@ public class KafkaListeners {
         String pretty = JSON.toJSONString(userList, SerializerFeature.PrettyFormat,
                 SerializerFeature.WriteDateUseDateFormat, SerializerFeature.WriteMapNullValue,
                 SerializerFeature.WriteNullListAsEmpty);
-
-        log.info("批量消费数据大小:{},message is :{}", userList.size(), pretty);
+        count += userList.size();
+        timeCount += (System.currentTimeMillis() - startTime);
+        log.info("批量消费数据大小:{} ,count is :{},total cost time is:{}", userList.size(), count, timeCount);
 
     }
 

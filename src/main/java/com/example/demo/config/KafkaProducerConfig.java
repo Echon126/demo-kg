@@ -29,7 +29,7 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.producer.buffer-memory}")
     private Integer bufferMemory;
 
-    @Value("${spring.kafka.producer.linger}")
+    @Value("${spring.kafka.producer.properties.linger.ms}")
     private Integer linger;
     
     private Map<String, Object> producerConfigs() {

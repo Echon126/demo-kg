@@ -62,13 +62,12 @@ spring:
       # acks=1 ： 只要集群的首领节点收到消息，生产者就会收到一个来自服务器成功响应。
       # acks=all ：只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。
       acks: 0
-      linger: 1
-#      properties:
-#        linger.ms: 50
-#        request.timeout.ms: 500
-#        max.block.ms: 500
-#        metadata.fetch.timeout.ms: 500
-#        max.in.flight.requests.per.connection: 20
+      properties:
+        linger.ms: 50
+        request.timeout.ms: 500
+        max.block.ms: 500
+        metadata.fetch.timeout.ms: 500
+        max.in.flight.requests.per.connection: 20
     #      properties:
 #          security:
 #            protocol: SASL_PLAINTEXT

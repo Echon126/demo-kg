@@ -41,7 +41,7 @@ public class KafkaController {
                 .createTime(LocalDateTime.now())
                 .build();
         long startTime = System.currentTimeMillis();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             user.setId(UUID.randomUUID().toString());
             //日期格式化
             String JSONUser = JSON.toJSONStringWithDateFormat(user, Contants.DateTimeFormat.DATE_TIME_PATTERN,

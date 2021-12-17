@@ -15,7 +15,8 @@ import org.springframework.web.client.RestTemplate;
  */
 
 @MapperScan(basePackages = {"com.example.demo"})
-@SpringBootApplication(exclude = {MultipartAutoConfiguration.class})
+//@SpringBootApplication(exclude = {MultipartAutoConfiguration.class})
+@SpringBootApplication
 public class DemoApplication {
 
     public static void main(String[] args) {

@@ -1,4 +1,3 @@
-/*
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
@@ -16,13 +15,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -83,19 +85,19 @@ public class UploadFileController {
     @ApiOperation(value = "文件上传")
     @PostMapping(value = "/upload")
     @ResponseBody
-    public Map<String, Object> xxx(@RequestParam(value = "file", required = false) MultipartFile[] file) throws IOException, InvalidBucketNameException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public Map<String, Object> xxx(@RequestParam(value = "file", required = false) MultipartFile file) throws IOException, InvalidBucketNameException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         long s = System.currentTimeMillis();
         Map<String, Object> data = new HashMap<>();
-//
-//        InputStream inputStream = m.getInputStream();
-//        long startTime = System.currentTimeMillis();
-//        PutObjectOptions putObjectOptions = new PutObjectOptions(inputStream.available(), -1);
-//        minioClient.putObject(MinioProp.MINIO_BUCKET, m.getOriginalFilename(), inputStream, putObjectOptions);
-//        log.info("上传耗时:{}，文件大小:{}", (System.currentTimeMillis() - startTime) / 1000 + "秒", m.getSize());
-//
-//        long ss = System.currentTimeMillis();
-//        String objectUrl = minioClient.getObjectUrl(MinioProp.MINIO_BUCKET, m.getOriginalFilename());
-//        log.info("获取连接耗时:{}", (System.currentTimeMillis() - ss) / 1000);
+
+        InputStream inputStream = file.getInputStream();
+        long startTime = System.currentTimeMillis();
+        PutObjectOptions putObjectOptions = new PutObjectOptions(inputStream.available(), -1);
+        minioClient.putObject(MinioProp.MINIO_BUCKET, file.getOriginalFilename(), inputStream, putObjectOptions);
+        log.info("上传耗时:{}，文件大小:{}", (System.currentTimeMillis() - startTime) / 1000 + "秒", file.getSize());
+
+        long ss = System.currentTimeMillis();
+        String objectUrl = minioClient.getObjectUrl(MinioProp.MINIO_BUCKET, file.getOriginalFilename());
+        log.info("获取连接耗时:{}", (System.currentTimeMillis() - ss) / 1000);
 
 
         log.info("耗时:{}", (System.currentTimeMillis() - s) / 1000 + "秒");
@@ -109,6 +111,17 @@ public class UploadFileController {
 
     }
 
+    @Autowired
+    private RestTemplate restTemplate;
+//
+//    @GetMapping("upload/info")
+//    public String uploadT() {
+//
+//        ResponseEntity<OutputStream> forEntity = this.restTemplate.("https://filesdev.cogiot.net/61a5d6f66303955ef29206c9/TeB7EC-4G-GW-CG20211109_To_20211111.bin", OutputStream.class);
+//        OutputStream body = forEntity.getBody();
+//
+//        return "SUCCESS";
+//    }
+
 
 }
-*/

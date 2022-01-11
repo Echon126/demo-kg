@@ -124,17 +124,11 @@ spring:
     #      completionTimeout: 30000
     #      telitTriggerMQTTTopics: thing/+/attribute/m2
 
-    #  rabbitmq:
-    #    host: 127.0.0.1
-    #    port: 5672
-    #    username: guest
-    #    password: guest
-    #    virtual-host: /JCcccHost  rabbitmq:
-    #    host: 127.0.0.1
-    #    port: 5672
-    #    username: guest
-    #    password: guest
-    #    virtual-host: /JCcccHost
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
     # 手动提交消息
   #    listener:
   #      simple:
@@ -144,11 +138,32 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 1000MB
+      max-file-size: 10000MB
+      max-request-size: 100000MB
   freemarker:
     suffix:
+jedis:
+  host: 127.0.0.1
+  password:
+  port: 6379
+  timeout: 2000
+  maxTotal: 15 # 最大连接数
+  maxIdle: 10 # 最大空闲连接
+  minIdle: 5 # 最小空闲连接
+  maxWaitMillis: 10000 # 获取连接最大等待时间
+  testOnBorrow: true # 获取连接时检测是否可用
 
+
+minio:
+  endpoint: https://test1126.cogiot.net/
+  accesskey: Admin_2021@zlsj
+  secretKey: Admin_2021@zlsj
+
+
+#minio:
+#  endpoint: https://cogiotdev.cogiot.net/
+#  accesskey: Admin_2021@cogiot
+#  secretKey: Admin_2021@cogiot
 
 #https://blog.csdn.net/wojiao228925661/article/details/81329660
 mybatis-plus:

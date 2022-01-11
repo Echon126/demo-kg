@@ -12,7 +12,7 @@ public class APIResultBody<T> {
     /**
      * 响应代码
      */
-    private String rtnCode;
+    private int rtnCode;
 
     /**
      * 响应消息
@@ -32,11 +32,11 @@ public class APIResultBody<T> {
         this.message = errorInfo.getResultMsg();
     }
 
-    public String getRtnCode() {
+    public int getRtnCode() {
         return rtnCode;
     }
 
-    public void setRtnCode(String rtnCode) {
+    public void setRtnCode(int rtnCode) {
         this.rtnCode = rtnCode;
     }
 
@@ -93,7 +93,7 @@ public class APIResultBody<T> {
     /**
      * 失败
      */
-    public static <T> APIResultBody<T> error(String code, String message) {
+    public static <T> APIResultBody<T> error(int code, String message) {
         APIResultBody<T> rb = new APIResultBody<>();
         rb.setRtnCode(code);
         rb.setMessage(message);
@@ -106,7 +106,7 @@ public class APIResultBody<T> {
      */
     public static <T> APIResultBody<T> error(String message) {
         APIResultBody<T> rb = new APIResultBody<>();
-        rb.setRtnCode("-1");
+        rb.setRtnCode(-1);
         rb.setMessage(message);
         rb.setData(null);
         return rb;

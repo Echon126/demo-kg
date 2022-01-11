@@ -5,7 +5,7 @@ package com.example.demo.exception;
  */
 public interface BaseErrorInfoInterface {
     /** 错误码*/
-    String getResultCode();
+    int getResultCode();
 
     /** 错误描述*/
     String getResultMsg();

@@ -24,5 +24,13 @@ public class Notes implements Serializable {
 
     private String description;
 
+    public Notes() {
 
+    }
+
+    public Notes(Integer id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
 }

@@ -34,12 +34,12 @@ public class KafkaSender {
         sender.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
             @Override
             public void onFailure(Throwable throwable) {
-               // log.error("failure");
+                log.error("failure");
             }
 
             @Override
             public void onSuccess(SendResult<String, String> stringStringSendResult) {
-               // log.info("success");
+                log.info("success");
             }
         });
 

@@ -1,25 +1,13 @@
 package com.example.demo.redis;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.example.demo.kafka.Contants;
-import com.example.demo.kafka.KafkaProducer;
-import com.example.demo.kafka.KafkaSender;
-import com.example.demo.kafka.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.Jedis;
 
 import java.io.*;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -29,9 +17,9 @@ public class RedisController {
     @GetMapping("/batch/redis")
     public String batchSendKafka(int val) {
 
-        Jedis jedis = new Jedis("127.0.0.1", 6379);
-        RedisDelayingQueue<String> queue = new RedisDelayingQueue<>(jedis, "q-demo");
-        queue.delay("codehole" + val, 5000 * val);
+//        Jedis jedis = new Jedis("127.0.0.1", 6379);
+//        RedisDelayingQueue<String> queue = new RedisDelayingQueue<>(jedis, "q-demo");
+//        queue.delay("codehole" + val, 5000 * val);
 
         return "SUCCESS";
     }
@@ -65,5 +53,19 @@ public class RedisController {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    @Autowired
+    private RedisBloomFilter redisBloomFilter;
+
+    @GetMapping("/redis/bloomFilter")
+    public String testBloomFilter() {
+        String[] strings  =new String[]{"8986112127501611523","8986112122201198969","8986112127501611526","8986112122201198963","8986032147200338646"};
+        for(String s :strings){
+            this.redisBloomFilter.put(s);
+            boolean exist = this.redisBloomFilter.isExist(s);
+            System.out.println(exist);
+        }
+
+        return "SUCCESS";
     }
 }

@@ -1,12 +1,11 @@
+/*
 package com.example.demo.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.UUID;
@@ -79,12 +78,14 @@ public class RedisDelayingQueue<T> {
         Thread consumer = new Thread(() -> queue.loop());
         producer.start();
         consumer.start();
-       /* try {
+       */
+/* try {
             producer.join();
             Thread.sleep(6000);
             consumer.interrupt();
             consumer.join();
         } catch (InterruptedException e) {
-        }*/
+        }*//*
+
     }
-}
+}*/

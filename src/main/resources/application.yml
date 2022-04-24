@@ -45,8 +45,14 @@ spring:
       # 数据库连接测试语句
       connection-test-query: SELECT 1
 
+  redis:
+    host: localhost
+    port: 6379
+    password: us3rpa88
+    timeout: 6000
+
   kafka:
-    bootstrap-servers: 127.0.0.1:9092
+    bootstrap-servers: 43.138.18.223:9092
     producer:
       # 发生错误后，消息重发的次数。
       retries: 0
@@ -129,12 +135,21 @@ spring:
     port: 5672
     username: guest
     password: guest
-    # 手动提交消息
-  #    listener:
-  #      simple:
-  #        acknowledge-mode: manual
-  #      direct:
-  #        acknowledge-mode: manual
+#     手动提交消息
+    listener:
+      simple:
+        acknowledge-mode: manual
+      direct:
+        acknowledge-mode: manual
+        auto-startuo: false
+
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200  # ES的连接地址，多个地址用逗号分隔
+      username: elastic                         # 用户名
+      password: Cogiot@2021               # 密码
+      connection-timeout: 60000           # 连接超时时间
+      read-timeout: 60000                 # 读取超时时间
 
   servlet:
     multipart:
@@ -142,17 +157,6 @@ spring:
       max-request-size: 100000MB
   freemarker:
     suffix:
-jedis:
-  host: 127.0.0.1
-  password:
-  port: 6379
-  timeout: 2000
-  maxTotal: 15 # 最大连接数
-  maxIdle: 10 # 最大空闲连接
-  minIdle: 5 # 最小空闲连接
-  maxWaitMillis: 10000 # 获取连接最大等待时间
-  testOnBorrow: true # 获取连接时检测是否可用
-
 
 minio:
   endpoint: https://test1126.cogiot.net/
@@ -171,6 +175,17 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:mapper/*Mapper.xml
   type-aliases-package: com.example.demo.domain.entity
+
+
+
+bloom:
+  filter:
+    expectedInsertions: 1000
+    fpp: 0.001F
+
+
+rabbitmq:
+  start: false
 
 
 

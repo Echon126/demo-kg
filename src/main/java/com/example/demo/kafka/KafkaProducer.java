@@ -42,12 +42,12 @@ public class KafkaProducer {
     //
     public static final String TOPIC_GROUP2 = "topic.group2";
 
-    public void send(Object obj) {
-        String obj2String = JSONObject.toJSONString(obj);
+    public void send(String obj2String) {
+
         log.info("准备发送消息为：{}", obj2String);
 
         //发送消息
-        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(TOPIC_TEST, obj2String);
+        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send("queue.device.change-msg", obj2String);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
             @Override

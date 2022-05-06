@@ -1,4 +1,4 @@
-package com.example.demo.utils;
+package com.example.emo.elastic.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
@@ -45,6 +45,7 @@ public class ElasticOperationUtil {
 
     private static final Integer DEFAULT_SHARDS = 1;
     private static final Integer DEFAULT_REPLICAS = 1;
+    private static final Integer MAX_RESULT_WINDOW = 100000000;
 
     /**
      * 创建index
@@ -64,6 +65,7 @@ public class ElasticOperationUtil {
                 .put("index.mapping.ignore_malformed", true)
                 .put("index.number_of_shards", shards == null ? DEFAULT_SHARDS : shards)
                 .put("index.number_of_replicas", replicas == null ? DEFAULT_REPLICAS : replicas)
+                .put("max_result_window", MAX_RESULT_WINDOW)
         );
         request.mapping(prop, XContentType.JSON);
 

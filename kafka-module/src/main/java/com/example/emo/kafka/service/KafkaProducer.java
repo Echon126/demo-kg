@@ -1,4 +1,4 @@
-package com.example.demo.kafka;
+package com.example.emo.kafka.service;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.emo.elastic.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
@@ -6,18 +6,32 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.*;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedAvg;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
+import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
+import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +71,7 @@ public class ElasticCommonController {
         messageBody.put("phone", "110");
         messageBody.put("principal", "赵四");
         messageBody.put("createTime", "createTime");
+        messageBody.put("ammount", 100);
         return messageBody;
     }
 
@@ -148,14 +163,21 @@ public class ElasticCommonController {
     public String batchInsertData() {
         List<IndexRequest> indexRequests = new ArrayList<>();
         List<Map<String, Object>> demoDtos = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            demoDtos.add(deviceAlarmTemplate());
+        Map<String, Object> objectMap = deviceAlarmTemplate();
+        for (int i = 0; i < 1000; i++) {
+            HashMap<String, Object> stringObjectHashMap = new HashMap<>(objectMap);
+            stringObjectHashMap.put("categoryCode","categoryCode"+(i+"-ABCD"));
+            demoDtos.add(stringObjectHashMap);
         }
+        int count = 1000;
         demoDtos.forEach(e -> {
             IndexRequest request = new IndexRequest("my-emo");
             //填充id
-            request.id(UUID.randomUUID().toString().replace("-", ""));
+            String uuid = UUID.randomUUID().toString().replace("-", "");
+            request.id(uuid);
             //先不修改id
+            e.put("id", uuid);
+            //e.put("categoryCode", e.get("categoryCode") + String.valueOf(count));
             request.source(e);
             request.opType(DocWriteRequest.OpType.CREATE);
             indexRequests.add(request);
@@ -182,7 +204,7 @@ public class ElasticCommonController {
     }
 
 
-    @PostMapping("/elastic/del")
+    @PostMapping("/elastic/delIndex")
     public String delElasticIndex(String indexName) {
         DeleteIndexRequest request = new DeleteIndexRequest(indexName);
         try {
@@ -193,14 +215,45 @@ public class ElasticCommonController {
         return "SUCCESS";
     }
 
+    @PostMapping("/elastic/del")
+    public String delElasticIndexData() {
+        DeleteRequest deleteRequest = new DeleteRequest();
+        deleteRequest.index("my-emo");
+        try {
+            deleteRequest.id("3c8c9c11e9d8474f979dfd841ba7660a");
+            restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "SUCCESS";
+    }
+
     @PostMapping("/elastic/createIndex")
-    public String createElasticIndex(){
-        CreateIndexRequest request = new CreateIndexRequest("my-emo");
+    public String createElasticIndex(String indexName) {
+        CreateIndexRequest request = new CreateIndexRequest(indexName);
         request.settings(Settings.builder()
                 .put("index.mapping.ignore_malformed", true)
                 .put("index.number_of_shards", 1)
                 .put("index.number_of_replicas", 1)
         );
+        request.mapping(" {\n" +
+                " \t\"properties\": {\n" +
+                "            \"name\":{\n" +
+                "             \"type\":\"keyword\"\n" +
+                "           },\n" +
+                "           \"description\": {\n" +
+                "              \"type\": \"text\"\n" +
+                "           },\n" +
+                "            \"price\":{\n" +
+                "             \"type\":\"long\"\n" +
+                "           },\n" +
+                "           \"pic\":{\n" +
+                "             \"type\":\"text\",\n" +
+                "             \"index\":false\n" +
+                "           }\n" +
+                " \t}\n" +
+                "}", XContentType.JSON);
+
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("name", "tcc");
         jsonMap.put("decription", "tcc");
@@ -214,4 +267,136 @@ public class ElasticCommonController {
         }
         return "SUCCESS";
     }
+
+    @PostMapping("/eastic/agg")
+    public String elasticAgg() {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        /**
+         * 使用tag字段进行桶分组
+         * 使用sum、avg进行指标聚合
+         */
+        TermsAggregationBuilder aggregationBuilder = AggregationBuilders.
+                terms("tag_tr").field("ammount").                   //桶分组
+                subAggregation(AggregationBuilders.sum("sum_id").field("ammount")); //求平均值
+
+        searchSourceBuilder.aggregation(aggregationBuilder);
+        /**
+         * 不输出原始数据
+         */
+        searchSourceBuilder.size(0);
+        /**
+         * 打印dsl语句
+         */
+        log.info("dsl:" + searchSourceBuilder.toString());
+        /**
+         * 设置索引以及填充语句
+         */
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices("my-emo");
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error("aggs failed.", e);
+        }
+        /**
+         * 解析数据，获取tag_tr的指标聚合参数。
+         */
+        Aggregations aggregations = response.getAggregations();
+        ParsedStringTerms parsedStringTerms = aggregations.get("tag_tr");
+        List<? extends Terms.Bucket> buckets = parsedStringTerms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            //key的数据
+            String key = bucket.getKey().toString();
+            long docCount = bucket.getDocCount();
+            //获取数据
+            Aggregations bucketAggregations = bucket.getAggregations();
+            ParsedSum sumId = bucketAggregations.get("sum_id");
+            ParsedAvg avgId = bucketAggregations.get("avg_id");
+            System.out.println(key + ":" + docCount + "-" + sumId.getValue() + "-" + avgId.getValue());
+        }
+
+        return "SUCCESS";
+    }
+
+    /**
+     * 获取count
+     *
+     * @return
+     */
+    @PostMapping("/elastic/count")
+    public Map<String, Object> elasticCount() {
+        Map<String, Object> resultData = new HashMap(2);
+        //构建判断条件
+        BoolQueryBuilder boolBuilder = new BoolQueryBuilder();
+
+        CountRequest countRequest = new CountRequest("my-emo");
+        countRequest.query(boolBuilder);
+        CountResponse countResponse;
+        long count = 0L;
+        try {
+            countResponse = restHighLevelClient.count(countRequest, RequestOptions.DEFAULT);
+            count = countResponse != null ? countResponse.getCount() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        resultData.put("count", count);
+        resultData.put("message", "SUCCESS");
+        return resultData;
+    }
+
+
+    /**
+     * 分组统计
+     *
+     * @return
+     */
+    @PostMapping("/elastic/term")
+    public Map<String, Object> term() {
+        Map<String, Object> resultData = new HashMap(2);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //根据姓名进行分组统计个数
+        TermsAggregationBuilder field = AggregationBuilders.terms("terms_name").field("categoryCode");
+        ValueCountAggregationBuilder countField = AggregationBuilders.count("count_name").field("categoryCode");
+        field.subAggregation(countField);
+        searchSourceBuilder.aggregation(field);
+        SearchRequest searchRequest = new SearchRequest("my-emo").source(searchSourceBuilder);
+        SearchResponse response = null;
+        try {
+            response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //分组在es中是分桶
+        ParsedStringTerms termsName = response.getAggregations().get("terms_name");
+        List<? extends Terms.Bucket> buckets = termsName.getBuckets();
+        buckets.forEach(naem -> {
+            String key = (String) naem.getKey();
+            ParsedValueCount countName = naem.getAggregations().get("count_name");
+            double value = countName.value();
+            log.info("name , count {} {}", key, value);
+        });
+
+        return resultData;
+    }
+
+
+//    private BoolQueryBuilder makeQueryParams(Demo demo) {
+//        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+//        //精确查找
+//        if (demo.getAge() != null) {
+//            boolQueryBuilder.must(termQuery("age", String.valueOf(demo.getAge())));
+//        }
+//        //范围匹配
+//        if (!StringUtils.isEmpty(demo.getCreateDate())) {
+//            boolQueryBuilder.must(rangeQuery("createDate").gte(demo.getCreateDate()).format("yyyy-MM-dd"));
+//        }
+//        //模糊匹配
+//        if (!StringUtils.isEmpty(demo.getName())) {
+//            boolQueryBuilder.must(QueryBuilders.wildcardQuery("name", String.format("*%s*", demo.getName())));
+//        }
+//        return boolQueryBuilder;
+//    }
 }

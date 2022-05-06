@@ -1,4 +1,4 @@
-package com.example.demo.kafka;
+package com.example.emo.kafka.service;
 
 /**
  * @Auther: hs
